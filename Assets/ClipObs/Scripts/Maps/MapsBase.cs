@@ -10,8 +10,9 @@ public class MapsBase
     public static MapBlock ZeroBlock;
     public static MapsBase world;
     public static string saveDataPath;
-    static int ColumNumber = 1;
-    static int RowNumber = 1;
+    static int ColumNumber ;
+    static int RowNumber;
+    static int amount;
     static MapSetting _Setting;
     public static void InitMapSetting(MapSetting setting)
     {
@@ -23,13 +24,15 @@ public class MapsBase
 
     public static void GenerateMapStart()
     {
+
         MapBlock[,] MapArray = new MapBlock[RowNumber, ColumNumber];
+        amount = 0;
         for (int i = 0; i < RowNumber; i++)
         {
             for (int j = 0; j < ColumNumber; j++)
             {
                 MapArray[i, j] = new MapBlock();
-
+                amount++;
             }
         }
         for (int i = 0; i < RowNumber; i++)
@@ -52,7 +55,6 @@ public class MapsBase
                 {
                     MapArray[i, j].Up = MapArray[i, j + 1];
                 }
-
             }
         }
         ZeroBlock = MapArray[0, 0];
@@ -67,6 +69,30 @@ public class MapsBase
     {
         ZeroBlock= MapSerializationUtility.Deserialization();
     }
+
+    public static MapBlock GetIndexMap(int x,int y)
+    {
+        if (x >= ColumNumber||y>=RowNumber)
+            return null;
+
+        MapBlock result = ZeroBlock;
+
+        int count = 0;
+        while(count<x)
+        {
+            if (result.Right != null)
+                result= result.Right;
+            count++;
+        }
+        count = 0;
+        while(count<y)
+        {
+            if (result.Up != null)
+                result = result.Up;
+        }
+        return result;
+    }
+
 
     static void SetBlock(MapBlock block)
     {
@@ -167,9 +193,9 @@ public class MapBlock
 
 public class MapBlockSize
 {
-    static Vector2 normal = new Vector2(20, 20);
-    static Vector2 big = new Vector2(30, 30);
-    static Vector2 small = new Vector2(10, 10);
+    public static Vector2 normal = new Vector2(20, 20);
+    public static Vector2 big = new Vector2(30, 30);
+    public static Vector2 small = new Vector2(10, 10);
     public enum Type
     {
         none,
@@ -178,7 +204,10 @@ public class MapBlockSize
         big,
     }
 
+    public static void Setting(MapSetting setting)
+    {
 
+    }
     public static Vector2 GetSize(Type type)
     {
 

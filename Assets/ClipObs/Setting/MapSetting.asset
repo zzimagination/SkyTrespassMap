@@ -15,7 +15,12 @@ MonoBehaviour:
   RowNumber: 5
   ColumNumber: 5
   gridSpacing: 30
-  MapBlock:
-  - {fileID: 5383891646414901387, guid: 040c768caa54c014abc4ef794b14ea71, type: 3}
-  - {fileID: 2872524485789509230, guid: f34a9e783c97d3b4bbd2e8ff7ce6d675, type: 3}
-  - {fileID: 6900770291045070996, guid: c0a8ef9e0d06118458810fda2b074f7e, type: 3}
+  normalBlock: {fileID: 5383891646414901387, guid: 040c768caa54c014abc4ef794b14ea71,
+    type: 3}
+  smallBlock: {fileID: 2872524485789509230, guid: f34a9e783c97d3b4bbd2e8ff7ce6d675,
+    type: 3}
+  bigBlock: {fileID: 6900770291045070996, guid: c0a8ef9e0d06118458810fda2b074f7e,
+    type: 3}
+  normalSize: {x: 0, y: 0, z: 0}
+  smallSize: {x: 0, y: 0, z: 0}
+  bigSize: {x: 0, y: 0, z: 0}

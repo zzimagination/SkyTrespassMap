@@ -55,8 +55,22 @@ public class MapManager : SerializedMonoBehaviour
     {
         if (block.currentObject)
             return;
-
-        GameObject go = Instantiate(setting.MapBlock[(int)block.size - 1],mapContent);
+        GameObject obj = null;
+        switch (block.size)
+        {
+            case MapBlockSize.Type.none:
+                return;
+            case MapBlockSize.Type.normal:
+                obj = setting.normalBlock;
+                break;
+            case MapBlockSize.Type.small:
+                obj = setting.smallBlock;
+                break;
+            case MapBlockSize.Type.big:
+                obj = setting.bigBlock;
+                break;
+        }
+        GameObject go= Instantiate(obj, mapContent);
         go.transform.position = block.localPosition;
         block.currentObject = go;
         if (block.Up != null)
