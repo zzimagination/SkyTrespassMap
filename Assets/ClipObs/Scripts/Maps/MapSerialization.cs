@@ -9,11 +9,13 @@ using Sirenix.Serialization;
 public class MapSerializationUtility
 {
     static MapsData mapsData;
+    static int codeTemp;
     public static void Serialization(MapBlock zero)
     {
         mapsData = new MapsData();
         mapsData.mapsDic = new Dictionary<int, MapUnit>();
         mapsData.idCode = 10000;
+        codeTemp = 10000;
         SetMapKey(zero);
         SetMapReference(zero);
         byte[] buffer = SerializationUtility.SerializeValue<MapsData>(mapsData, DataFormat.Binary);
@@ -24,18 +26,58 @@ public class MapSerializationUtility
 
     }
 
-    //public static MapBlock Deserialization()
-    //{
+    public static MapBlock Deserialization()
+    {
 
-    //}
+        using (FileStream fs = new FileStream(MapsBase.saveDataPath, FileMode.OpenOrCreate))
+        {
+            byte[] buffer = new byte[fs.Length];
+            fs.Read(buffer, 0, buffer.Length);
+            mapsData = SerializationUtility.DeserializeValue<MapsData>(buffer, DataFormat.Binary);
+
+        }
+
+        Dictionary<int, MapBlock> blocks = new Dictionary<int, MapBlock>();
+
+        foreach (int key in mapsData.mapsDic.Keys)
+        {
+            MapUnit unit = mapsData.mapsDic[key];
+            MapBlock mapBlock = new MapBlock();
+            mapBlock.key = key;
+            mapBlock.size = unit.size;
+            mapBlock.localPosition = unit.localPosition;
+            blocks[key] = mapBlock;
+        }
+        foreach (int key in mapsData.mapsDic.Keys)
+        {
+            MapUnit unit = mapsData.mapsDic[key];
+            if(unit.Up>0)
+            {
+                blocks[key].Up = blocks[unit.Up];
+            }
+            if(unit.Down>0)
+            {
+                blocks[key].Down = blocks[unit.Down];
+            }
+            if(unit.Left>0)
+            {
+                blocks[key].Left = blocks[unit.Left];
+            }
+            if(unit.Right>0)
+            {
+                blocks[key].Right=blocks[unit.Right];
+            }
+        }
+        return blocks[mapsData.idCode];
+    }
 
     static void SetMapKey(MapBlock block)
     {
         if (block.key != 0)
             return;
         MapUnit unit = new MapUnit();
-        unit.key = block.key =mapsData.idCode;
-        mapsData.idCode++;
+        unit.key = block.key = codeTemp;
+        codeTemp++;
         unit.size = block.size;
         unit.localPosition = block.localPosition;
         mapsData.mapsDic.Add(unit.key, unit);
@@ -51,7 +93,7 @@ public class MapSerializationUtility
 
     static void SetMapReference(MapBlock block)
     {
-        MapUnit unit =mapsData.mapsDic[block.key];
+        MapUnit unit = mapsData.mapsDic[block.key];
         if (unit.referenced)
             return;
         if (block.Up != null && unit.Up == 0)

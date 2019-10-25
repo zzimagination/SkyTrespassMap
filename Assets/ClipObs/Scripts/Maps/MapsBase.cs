@@ -59,8 +59,15 @@ public class MapsBase
 
         SetBlock(ZeroBlock);
         SetMapPosition(ZeroBlock);
-        CreatPrefab(ZeroBlock);
+
+        MapSerializationUtility.Serialization(MapsBase.ZeroBlock);
     }
+
+    public static void LoadMapStart()
+    {
+        ZeroBlock= MapSerializationUtility.Deserialization();
+    }
+
     static void SetBlock(MapBlock block)
     {
         if (block.size != MapBlockSize.Type.none)
@@ -77,11 +84,11 @@ public class MapsBase
         else
         {
             int t = UnityEngine.Random.Range(0, 100);
-            if (t < 17)
+            if (t < 20)
             {
                 block.size = MapBlockSize.Type.big;
             }
-            else if (t < 50)
+            else if (t < 40)
             {
                 block.size = MapBlockSize.Type.small;
             }
@@ -137,24 +144,8 @@ public class MapsBase
                 mapBlocks.Enqueue(block.Right);
         }
     }
-    static void CreatPrefab(MapBlock block)
-    {
-        if (block.currentObject)
-            return;
 
-        GameObject go = GameObject.Instantiate(_Setting.MapBlock[(int)block.size - 1]);
-        go.transform.position = block.localPosition;
-        block.currentObject = go;
-        if (block.Up != null)
-        {
-            CreatPrefab(block.Up);
-        }
 
-        if (block.Right != null)
-        {
-            CreatPrefab(block.Right);
-        }
-    }
 }
 
 
