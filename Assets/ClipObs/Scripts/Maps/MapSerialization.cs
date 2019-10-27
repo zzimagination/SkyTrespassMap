@@ -6,147 +6,216 @@ using System.Text;
 using UnityEngine;
 using Sirenix.Serialization;
 
-public class MapSerializationUtility
+
+namespace SkyTrepass.Map.Serialization
 {
-    static MapsData mapsData;
-    static int codeTemp;
-    public static void Serialization(MapBlock zero)
+    public class MapSerializationUtility
     {
-        mapsData = new MapsData();
-        mapsData.mapsDic = new Dictionary<int, MapUnit>();
-        mapsData.idCode = 10000;
-        codeTemp = 10000;
-        SetMapKey(zero);
-        SetMapReference(zero);
-        byte[] buffer = SerializationUtility.SerializeValue<MapsData>(mapsData, DataFormat.Binary);
-        using (FileStream fs = new FileStream(MapsBase.saveDataPath, FileMode.Create))
+        static MapsData mapsData;
+        static int codeTemp;
+        public static void Serialization()
         {
-            fs.Write(buffer, 0, buffer.Length);
-        }
-
-    }
-
-    public static MapBlock Deserialization()
-    {
-
-        using (FileStream fs = new FileStream(MapsBase.saveDataPath, FileMode.OpenOrCreate))
-        {
-            byte[] buffer = new byte[fs.Length];
-            fs.Read(buffer, 0, buffer.Length);
-            mapsData = SerializationUtility.DeserializeValue<MapsData>(buffer, DataFormat.Binary);
-
-        }
-
-        Dictionary<int, MapBlock> blocks = new Dictionary<int, MapBlock>();
-
-        foreach (int key in mapsData.mapsDic.Keys)
-        {
-            MapUnit unit = mapsData.mapsDic[key];
-            MapBlock mapBlock = new MapBlock();
-            mapBlock.key = key;
-            mapBlock.size = unit.size;
-            mapBlock.localPosition = unit.localPosition;
-            blocks[key] = mapBlock;
-        }
-        foreach (int key in mapsData.mapsDic.Keys)
-        {
-            MapUnit unit = mapsData.mapsDic[key];
-            if(unit.Up>0)
+            if(mapsData==null)
+                mapsData = new MapsData();
+            Dictionary<int, MapBlock> mapsDic = MapsBase.MapsDic;
+            mapsData.mapsDic = new Dictionary<int, MapUnit>();
+            foreach (int key in mapsDic.Keys)
             {
-                blocks[key].Up = blocks[unit.Up];
+                MapUnit unit = new MapUnit();
+                unit.key = mapsDic[key].roofCode;
+                unit.size = mapsDic[key].size;
+                unit.localPosition = mapsDic[key].localPosition;
+                unit.buildings = mapsDic[key].buildings;
+                if (mapsDic[key].Up != null)
+                {
+                    unit.Up = mapsDic[key].Up.roofCode;
+                }
+                if (mapsDic[key].Down != null)
+                {
+                    unit.Down = mapsDic[key].Down.roofCode;
+                }
+                if (mapsDic[key].Left != null)
+                {
+                    unit.Left = mapsDic[key].Left.roofCode;
+                }
+                if (mapsDic[key].Right != null)
+                {
+                    unit.Right = mapsDic[key].Right.roofCode;
+                }
+
+
+                mapsData.mapsDic.Add(key, unit);
             }
-            if(unit.Down>0)
+
+            List<Bridge> bridges = BridgeBase.bridges;
+            mapsData.bridges = new List<BridgeUnit>();
+            for (int i = 0; i < bridges.Count; i++)
             {
-                blocks[key].Down = blocks[unit.Down];
+                BridgeUnit unit = new BridgeUnit();
+                unit.length =bridges[i].length;
+                unit.position = bridges[i].position;
+                unit.rotation = bridges[i].rotation;
+                mapsData.bridges.Add(unit);
             }
-            if(unit.Left>0)
+
+            byte[] buffer = SerializationUtility.SerializeValue<MapsData>(mapsData, DataFormat.Binary);
+
+            using (FileStream fs = new FileStream(MapsBase.saveDataPath, FileMode.Create))
             {
-                blocks[key].Left = blocks[unit.Left];
+                fs.Write(buffer, 0, buffer.Length);
             }
-            if(unit.Right>0)
+
+        }
+
+        public static void Deserialization()
+        {
+
+            using (FileStream fs = new FileStream(MapsBase.saveDataPath, FileMode.OpenOrCreate))
             {
-                blocks[key].Right=blocks[unit.Right];
+                byte[] buffer = new byte[fs.Length];
+                fs.Read(buffer, 0, buffer.Length);
+                mapsData = SerializationUtility.DeserializeValue<MapsData>(buffer, DataFormat.Binary);
+
+            }
+            if (mapsData.mapsDic != null)
+            {
+                Dictionary<int, MapBlock> blocks = new Dictionary<int, MapBlock>();
+
+                foreach (int key in mapsData.mapsDic.Keys)
+                {
+                    MapUnit unit = mapsData.mapsDic[key];
+                    MapBlock mapBlock = new MapBlock();
+                    mapBlock.roofCode = key;
+                    mapBlock.size = unit.size;
+                    mapBlock.localPosition = unit.localPosition;
+                    mapBlock.buildings = unit.buildings;
+                    blocks[key] = mapBlock;
+                }
+                foreach (int key in mapsData.mapsDic.Keys)
+                {
+                    MapUnit unit = mapsData.mapsDic[key];
+                    if (unit.Up > 0)
+                    {
+                        blocks[key].Up = blocks[unit.Up];
+                    }
+                    if (unit.Down > 0)
+                    {
+                        blocks[key].Down = blocks[unit.Down];
+                    }
+                    if (unit.Left > 0)
+                    {
+                        blocks[key].Left = blocks[unit.Left];
+                    }
+                    if (unit.Right > 0)
+                    {
+                        blocks[key].Right = blocks[unit.Right];
+                    }
+
+
+                }
+
+                MapsBase.MapsDic = blocks;
+            }
+            if (mapsData.bridges != null)
+            {
+                List<Bridge> bridges = new List<Bridge>();
+
+                for (int i = 0; i < mapsData.bridges.Count; i++)
+                {
+                    Bridge bridge = new Bridge();
+                    bridge.length = mapsData.bridges[i].length;
+                    bridge.position = mapsData.bridges[i].position;
+                    bridge.rotation = mapsData.bridges[i].rotation;
+                    bridges.Add(bridge);
+                }
+                BridgeBase.bridges = bridges;
             }
         }
-        return blocks[mapsData.idCode];
-    }
 
-    static void SetMapKey(MapBlock block)
-    {
-        if (block.key != 0)
-            return;
-        MapUnit unit = new MapUnit();
-        unit.key = block.key = codeTemp;
-        codeTemp++;
-        unit.size = block.size;
-        unit.localPosition = block.localPosition;
-        mapsData.mapsDic.Add(unit.key, unit);
-        if (block.Up != null)
+        //static void SetMapKey(MapBlock block)
+        //{
+        //    if (block.roofCode != 0)
+        //        return;
+        //    MapUnit unit = new MapUnit();
+        //    unit.key = block.roofCode = codeTemp;
+        //    codeTemp++;
+        //    unit.size = block.size;
+        //    unit.localPosition = block.localPosition;
+        //    mapsData.mapsDic.Add(unit.key, unit);
+        //    if (block.Up != null)
+        //    {
+        //        SetMapKey(block.Up);
+        //    }
+        //    if (block.Right != null)
+        //    {
+        //        SetMapKey(block.Right);
+        //    }
+        //}
+
+        //static void SetMapReference(MapBlock block)
+        //{
+        //    MapUnit unit = mapsData.mapsDic[block.roofCode];
+        //    if (unit.referenced)
+        //        return;
+        //    if (block.Up != null && unit.Up == 0)
+        //    {
+        //        unit.Up = block.Up.roofCode;
+        //    }
+
+        //    if (block.Down != null && unit.Down == 0)
+        //    {
+        //        unit.Down = block.Down.roofCode;
+        //    }
+
+        //    if (block.Left != null && unit.Left == 0)
+        //    {
+        //        unit.Left = block.Left.roofCode;
+        //    }
+
+        //    if (block.Right != null && unit.Right == 0)
+        //    {
+        //        unit.Right = block.Right.roofCode;
+        //    }
+        //    unit.referenced = true;
+
+        //    if (block.Up != null)
+        //    {
+        //        SetMapReference(block.Up);
+        //    }
+        //    if (block.Right != null)
+        //    {
+        //        SetMapReference(block.Right);
+        //    }
+
+        //}
+
+        [Serializable]
+        public class MapUnit
         {
-            SetMapKey(block.Up);
+            public int key;
+            public MapBlockSize.Type size;
+            public Vector3 localPosition;
+            public int buildings;
+            public int Up;
+            public int Down;
+            public int Left;
+            public int Right;
+
+
         }
-        if (block.Right != null)
+        [Serializable]
+        public class BridgeUnit
         {
-            SetMapKey(block.Right);
+            public float length;
+            public Vector3 position;
+            public Quaternion rotation;
         }
-    }
-
-    static void SetMapReference(MapBlock block)
-    {
-        MapUnit unit = mapsData.mapsDic[block.key];
-        if (unit.referenced)
-            return;
-        if (block.Up != null && unit.Up == 0)
+        [Serializable]
+        public class MapsData
         {
-            unit.Up = block.Up.key;
+            public Dictionary<int, MapUnit> mapsDic;
+            public int idCode;
+            public List<BridgeUnit> bridges;
         }
-
-        if (block.Down != null && unit.Down == 0)
-        {
-            unit.Down = block.Down.key;
-        }
-
-        if (block.Left != null && unit.Left == 0)
-        {
-            unit.Left = block.Left.key;
-        }
-
-        if (block.Right != null && unit.Right == 0)
-        {
-            unit.Right = block.Right.key;
-        }
-        unit.referenced = true;
-
-        if (block.Up != null)
-        {
-            SetMapReference(block.Up);
-        }
-        if (block.Right != null)
-        {
-            SetMapReference(block.Right);
-        }
-
-    }
-
-    [Serializable]
-    public class MapUnit
-    {
-        public int key;
-        public MapBlockSize.Type size;
-        public Vector3 localPosition;
-
-        public int Up;
-        public int Down;
-        public int Left;
-        public int Right;
-
-        public bool referenced;
-
-    }
-    [Serializable]
-    public class MapsData
-    {
-        public Dictionary<int, MapUnit> mapsDic = new Dictionary<int, MapUnit>();
-        public int idCode;
     }
 }

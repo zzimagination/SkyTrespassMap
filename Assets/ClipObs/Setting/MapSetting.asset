@@ -15,12 +15,19 @@ MonoBehaviour:
   RowNumber: 5
   ColumNumber: 5
   gridSpacing: 30
-  normalBlock: {fileID: 5383891646414901387, guid: 040c768caa54c014abc4ef794b14ea71,
+  normalBlock: {fileID: 2650015717922635226, guid: 5ac6d96aef9288f4f838f9d1e6a629a0,
     type: 3}
-  smallBlock: {fileID: 2872524485789509230, guid: f34a9e783c97d3b4bbd2e8ff7ce6d675,
+  smallBlock: {fileID: 2815700955262867789, guid: 0b05240d250339045a2069e3f7569da6,
     type: 3}
-  bigBlock: {fileID: 6900770291045070996, guid: c0a8ef9e0d06118458810fda2b074f7e,
+  bigBlock: {fileID: 4005587248531626272, guid: 2e0c8d3433946f64aa8aa80628de04e1,
     type: 3}
   normalSize: {x: 0, y: 0, z: 0}
   smallSize: {x: 0, y: 0, z: 0}
   bigSize: {x: 0, y: 0, z: 0}
+  smallBuildings:
+  - {fileID: 6418769514247852887, guid: 723ebe7ac152e6a4080323e50e1dc4d6, type: 3}
+  normalBuildings:
+  - {fileID: 5692782600335272478, guid: f7df920e738119841b475994aa03cc8b, type: 3}
+  bigBuildings:
+  - {fileID: 2140078771350388876, guid: 116ffbe012a53bb4cb2cff8c4b24f1eb, type: 3}
+  bridge: {fileID: 8651515017376416034, guid: 530c8cd6ceb59184ab7a6bb5ed324103, type: 3}

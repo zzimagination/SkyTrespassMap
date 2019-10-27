@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IHiddenObstacle
+namespace SkyTrepass.Map
 {
-    void JudgeOn();
-    void CompareIsOn();
+    public interface IHiddenObstacle
+    {
+        void JudgeOn();
+        bool CompareIsOn();
+    }
 }

@@ -3,50 +3,52 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
-public class CamereObstacleCheck : MonoBehaviour
+namespace SkyTrepass.Map
 {
-    public Transform player;
-    RaycastHit[] raycastHits;
-
-    List<HiddenObstacle> currentObs = new List<HiddenObstacle>();
-    Camera _camera;
-    Vector3 dis;
-    // Start is called before the first frame update
-    void Start()
+    public class CamereObstacleCheck : MonoBehaviour
     {
+        public Transform player;
+        RaycastHit[] raycastHits;
 
-        _camera = GetComponent<Camera>();
-        dis = _camera.transform.position - player.position;
-        raycastHits = new RaycastHit[4];
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        for (int i = 0; i < raycastHits.Length; i++)
+        List<IHiddenObstacle> hiddens;
+        Camera _camera;
+        Vector3 dis;
+        // Start is called before the first frame update
+        void Start()
         {
-            var tr = raycastHits[i].transform;
-            if (tr)
+            hiddens = new List<IHiddenObstacle>();
+            _camera = GetComponent<Camera>();
+            dis = _camera.transform.position - player.position;
+            raycastHits = new RaycastHit[4];
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            _camera.transform.position = player.position + dis;
+            Vector3 dir = player.position - _camera.transform.position;
+            int cnumber = Physics.RaycastNonAlloc(_camera.transform.position, dir.normalized, raycastHits);
+            for (int i = 0; i < cnumber; i++)
             {
-                var t = tr.GetComponent<IHiddenObstacle>();
-                t?.CompareIsOn();
+                var t = raycastHits[i].transform.GetComponent<IHiddenObstacle>();
+                if (t != null)
+                {
+                    t.JudgeOn();
+                    if (!hiddens.Contains(t))
+                        hiddens.Add(t);
+                }
             }
         }
-        Vector3 dir = player.position - _camera.transform.position;
-        Physics.RaycastNonAlloc(_camera.transform.position, dir.normalized, raycastHits);
-        for (int i = 0; i < raycastHits.Length; i++)
+
+        private void LateUpdate()
         {
-            var tr = raycastHits[i].transform;
-            if (tr)
+            for (int i = hiddens.Count - 1; i >= 0; i--)
             {
-                var t = tr.GetComponent<IHiddenObstacle>();
-                t?.JudgeOn();
+                if (hiddens[i].CompareIsOn())
+                {
+                    hiddens.Remove(hiddens[i]);
+                }
             }
         }
-    }
-
-    private void LateUpdate()
-    {
-        _camera.transform.position = player.position + dis;
     }
 }

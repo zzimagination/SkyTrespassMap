@@ -2,36 +2,37 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HiddenObstacle : MonoBehaviour,IHiddenObstacle
+namespace SkyTrepass.Map
 {
-    Renderer renders;
-    bool isOn;
-    public void JudgeOn()
+    public class HiddenObstacle : MonoBehaviour, IHiddenObstacle
     {
-        if(!renders)
+        protected Renderer renders;
+        protected bool isOn;
+
+        public virtual void JudgeOn()
         {
-            renders = GetComponent<Renderer>();
+            if (!renders)
+            {
+                renders = GetComponent<Renderer>();
+            }
+
+            isOn = false;
         }
-        isOn = false;
-    }
 
-    public void CompareIsOn()
-    {
-
-        isOn = true;
-        StartCoroutine(EndFrame());
-    }
-
-    IEnumerator EndFrame()
-    {
-        yield return new WaitForEndOfFrame();
-        if (isOn)
+        public virtual bool CompareIsOn()
         {
-            renders.enabled = true;
-        }
-        else
-        {
-            renders.enabled = false;
+            if (isOn)
+            {
+                renders.enabled = true;
+                return true;
+            }
+            else
+            {
+                renders.enabled = false;
+                isOn = true;
+                return false;
+            }
+
         }
     }
 }
