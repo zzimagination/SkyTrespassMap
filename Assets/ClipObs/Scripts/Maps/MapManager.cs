@@ -34,22 +34,60 @@ namespace SkyTrepass.Map
             int width = Screen.width;
             int height = Screen.height;
 
-            Rect buttonRect = new Rect(0, 0, 100, 40);
+            Rect buttonRect = new Rect(0, 0, width/3, 40);
 
             if (GUI.Button(buttonRect, "生成地图"))
             {
                 MapsBase.GenerateMapStart();
-                //CreateAllMaps();
-                //CreateAllBridges();
+                CreateAllMaps();
+                CreateAllBridges();
             }
             buttonRect.y += 50;
             if (GUI.Button(buttonRect, "读取地图"))
             {
-                MapsBase.LoadMapStart();
-                //CreateAllMaps();
-                //CreateAllBridges();
+                var r= MapsBase.LoadMapStart();
+                StartCoroutine(LoadMapDataComplete(r));
             }
+            buttonRect.y += 50;
+            if(GUI.Button(buttonRect,"隐藏大地图"))
+            {
+
+                for (int i = 0; i < MapsBase.bigBlocks.Length; i++)
+                {
+                    MapsBase.bigBlocks[i].currentObject.SetActive(false);
+                } 
+            }
+            buttonRect.y += 50;
+            if (GUI.Button(buttonRect, "隐藏小地图"))
+            {
+
+                for (int i = 0; i < MapsBase.smallBlocks.Length; i++)
+                {
+                    MapsBase.smallBlocks[i].currentObject.SetActive(false);
+                }
+            }
+            buttonRect.y += 50;
+            if (GUI.Button(buttonRect, "隐藏中地图"))
+            {
+
+                for (int i = 0; i < MapsBase.normalBlocks.Length; i++)
+                {
+                    MapsBase.normalBlocks[i].currentObject.SetActive(false);
+                }
+            }
+
         }
+
+        IEnumerator LoadMapDataComplete(Serialization.SerializationAsyncResult result)
+        {
+            while(!result.IsCompleted())
+            {
+                yield return null;
+            }
+            CreateAllMaps();
+            CreateAllBridges();
+        }
+        
         public void CreateAllBridges()
         {
             for (int i = 0; i < BridgeBase.bridges.Count; i++)
@@ -68,6 +106,7 @@ namespace SkyTrepass.Map
         {
             GenerateMapsRecursion(MapsBase.ZeroBlock);
         }
+
         void GenerateMapsRecursion(MapBlock block)
         {
             if (block.currentObject)
@@ -95,7 +134,6 @@ namespace SkyTrepass.Map
             go.transform.position = block.localPosition;
             block.currentObject = go;
             GameObject b = Instantiate(building, go.transform);
-            b.GetComponent<Renderer>().sortingOrder = 1;
             b.transform.localPosition = new Vector3(0, 0.001f, 0);
             if (block.Up != null)
             {

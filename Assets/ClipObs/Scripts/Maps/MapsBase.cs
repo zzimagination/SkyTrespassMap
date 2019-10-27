@@ -9,24 +9,30 @@ namespace SkyTrepass.Map
 
     public class MapsBase
     {
-
         public static MapBlock ZeroBlock;
         public static MapsBase world;
         public static string saveDataPath;
         public static Dictionary<int, MapBlock> MapsDic;
+
+        public static MapBlock[] normalBlocks;
+        public static MapBlock[] bigBlocks;
+        public static MapBlock[] smallBlocks;
+
         static int ColumNumber;
         static int RowNumber;
-
+        static int gridSpace;
         static MapSetting _Setting;
 
-        const int mapStartCode = 10000;
+        public const int mapStartCode = 10000;
 
         public static void InitMapSetting(MapSetting setting)
         {
             _Setting = setting;
             RowNumber = setting.RowNumber;
             ColumNumber = setting.ColumNumber;
+            gridSpace = setting.gridSpacing;
             saveDataPath = Application.streamingAssetsPath + "/maps";
+            MapBlockSize.Setting(setting);
         }
 
         public static void GenerateMapStart()
@@ -78,13 +84,13 @@ namespace SkyTrepass.Map
             SetBuildings();
             BridgeBase.GenerateStart(ZeroBlock);
 
-            MapSerializationUtility.Serialization();
+            MapSerializationUtility.SerializationAsync();
         }
 
-        public static void LoadMapStart()
+        public static SerializationAsyncResult LoadMapStart()
         {
-            MapSerializationUtility.Deserialization();
-            ZeroBlock = MapsDic[mapStartCode];
+            SerializationAsyncResult result = MapSerializationUtility.DeserializationAsync();
+            return result;
         }
 
         public static MapBlock GetIndexMap(int x, int y)
@@ -112,9 +118,12 @@ namespace SkyTrepass.Map
 
         static void SetBlockSize()
         {
+            List<MapBlock> normal = new List<MapBlock>();
+            List<MapBlock> small = new List<MapBlock>();
+            List<MapBlock> big = new List<MapBlock>();
             foreach (int key in MapsDic.Keys)
             {
-                UnityEngine.Random.InitState(MapsDic[key].GetHashCode());
+                UnityEngine.Random.InitState(RandomSeed.GetSeed());
                 if ((MapsDic[key].Left != null && MapsDic[key].Left.size == MapBlockSize.Type.big) ||
                 (MapsDic[key].Down != null && MapsDic[key].Down.size == MapBlockSize.Type.big) ||
                 (MapsDic[key].Up != null && MapsDic[key].Up.size == MapBlockSize.Type.big) ||
@@ -137,9 +146,19 @@ namespace SkyTrepass.Map
                     else
                     {
                         MapsDic[key].size = MapBlockSize.Type.normal;
+                        
                     }
                 }
+                if (MapsDic[key].size == MapBlockSize.Type.normal)
+                    normal.Add(MapsDic[key]);
+                else if (MapsDic[key].size == MapBlockSize.Type.small)
+                    small.Add(MapsDic[key]);
+                else
+                    big.Add(MapsDic[key]);
             }
+            bigBlocks = big.ToArray();
+            smallBlocks = small.ToArray();
+            normalBlocks = normal.ToArray();
         }
 
         #region 遍历图元法
@@ -198,7 +217,7 @@ namespace SkyTrepass.Map
                     continue;
                 if (block.Left != null)
                 {
-                    _x = block.Left.localPosition.x + _Setting.gridSpacing;
+                    _x = block.Left.localPosition.x + gridSpace;
                 }
                 else
                 {
@@ -206,7 +225,7 @@ namespace SkyTrepass.Map
                 }
                 if (block.Down != null)
                 {
-                    _z = block.Down.localPosition.z + _Setting.gridSpacing;
+                    _z = block.Down.localPosition.z + gridSpace;
                 }
                 else
                 {
@@ -225,7 +244,7 @@ namespace SkyTrepass.Map
         {
             foreach (int key in MapsDic.Keys)
             {
-                UnityEngine.Random.InitState(MapsDic[key].GetHashCode());
+                UnityEngine.Random.InitState(RandomSeed.GetSeed());
                 switch (MapsDic[key].size)
                 {
                     case MapBlockSize.Type.none:
@@ -289,7 +308,9 @@ namespace SkyTrepass.Map
 
         public static void Setting(MapSetting setting)
         {
-
+            normal = setting.normal;
+            big = setting.big;
+            small = setting.small;
         }
         public static Vector2 GetSize(Type type)
         {

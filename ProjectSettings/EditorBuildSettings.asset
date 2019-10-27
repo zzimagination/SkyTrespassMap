@@ -4,7 +4,10 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/ClipObs/Scenes/Map.unity
+    guid: c2be816690ddfe84ba584e390c1aa02b
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: 2eb8429d59a57af4abad48a27be7b6c2,
       type: 2}

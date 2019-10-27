@@ -11,8 +11,8 @@ namespace SkyTrepass.Map
 
         public BuildingsFloor[] floors;
         public Light MainLight;
-        public EnvironmentConfig indoor;
-        public EnvironmentConfig outDoor;
+        public EnvironmentConfig environmentConfig;
+
         public BuildingRoof Roof;
         public GameObject bottom;
 
@@ -23,12 +23,6 @@ namespace SkyTrepass.Map
         {
             MainLight = GameObject.FindGameObjectWithTag("MainLight").GetComponent<Light>();
             StandByBuildings();
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-
         }
 
 
@@ -55,26 +49,42 @@ namespace SkyTrepass.Map
         {
             if (inBuilding)
                 return;
-            EnvironmentConfig c = indoor;
+
+            for (int i = 0; i < environmentConfig.configs.Length; i++)
+            {
+                if (environmentConfig.configs[i].name.Equals("InDoor"))
+                {
+                    var c = environmentConfig.configs[i];
+                    RenderSettings.ambientSkyColor = c.SkyColor;
+                    RenderSettings.ambientEquatorColor = c.EquatorColor;
+                    RenderSettings.ambientGroundColor = c.GroundColor;
+                    MainLight.intensity = c.MainLightIntensity;
+                    MainLight.shadows = c.mainShadows;
+                    break;
+                }
+            }
             RunningBuildings();
-            RenderSettings.ambientSkyColor = c.SkyColor;
-            RenderSettings.ambientEquatorColor = c.EquatorColor;
-            RenderSettings.ambientGroundColor = c.GroundColor;
-            MainLight.intensity = c.MainLightIntensity;
-            MainLight.shadows = c.mainShadows;
             inBuilding = true;
         }
         public void OutBuilding()
         {
             if (inBuilding == false)
                 return;
-            EnvironmentConfig c = outDoor;
+
+            for (int i = 0; i < environmentConfig.configs.Length; i++)
+            {
+                if (environmentConfig.configs[i].name.Equals("OutDoor"))
+                {
+                    var c = environmentConfig.configs[i];
+                    RenderSettings.ambientSkyColor = c.SkyColor;
+                    RenderSettings.ambientEquatorColor = c.EquatorColor;
+                    RenderSettings.ambientGroundColor = c.GroundColor;
+                    MainLight.intensity = c.MainLightIntensity;
+                    MainLight.shadows = c.mainShadows;
+                    break;
+                }
+            }
             StandByBuildings();
-            RenderSettings.ambientSkyColor = c.SkyColor;
-            RenderSettings.ambientEquatorColor = c.EquatorColor;
-            RenderSettings.ambientGroundColor = c.GroundColor;
-            MainLight.intensity = c.MainLightIntensity;
-            MainLight.shadows = c.mainShadows;
             inBuilding = false;
         }
 

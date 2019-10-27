@@ -14,16 +14,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MapSetting
   RowNumber: 5
   ColumNumber: 5
-  gridSpacing: 30
+  gridSpacing: 60
   normalBlock: {fileID: 2650015717922635226, guid: 5ac6d96aef9288f4f838f9d1e6a629a0,
     type: 3}
   smallBlock: {fileID: 2815700955262867789, guid: 0b05240d250339045a2069e3f7569da6,
     type: 3}
   bigBlock: {fileID: 4005587248531626272, guid: 2e0c8d3433946f64aa8aa80628de04e1,
     type: 3}
-  normalSize: {x: 0, y: 0, z: 0}
-  smallSize: {x: 0, y: 0, z: 0}
-  bigSize: {x: 0, y: 0, z: 0}
+  small: {x: 20, y: 20}
+  normal: {x: 40, y: 40}
+  big: {x: 60, y: 60}
   smallBuildings:
   - {fileID: 6418769514247852887, guid: 723ebe7ac152e6a4080323e50e1dc4d6, type: 3}
   normalBuildings:

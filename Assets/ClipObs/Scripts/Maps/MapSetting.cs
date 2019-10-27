@@ -23,12 +23,9 @@ namespace SkyTrepass.Map
         [BoxGroup("MapBlock")]
         public GameObject bigBlock;
         [Title("MapBlock Size")]
-
-        public Vector3 normalSize;
-
-        public Vector3 smallSize;
-
-        public Vector3 bigSize;
+        public Vector2 small;
+        public Vector2 normal;
+        public Vector2 big;
 
         [BoxGroup("MapBuilding")]
         public List<GameObject> smallBuildings;
