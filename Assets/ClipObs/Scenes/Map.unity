@@ -527,7 +527,7 @@ GameObject:
   - component: {fileID: 6769820539338226921}
   - component: {fileID: 6769820539338226919}
   - component: {fileID: 6769820539338226920}
-  m_Layer: 9
+  m_Layer: 8
   m_Name: Cube
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -668,7 +668,7 @@ GameObject:
   - component: {fileID: 6769820539913054564}
   - component: {fileID: 6769820539913054565}
   - component: {fileID: 6769820539913054563}
-  m_Layer: 9
+  m_Layer: 8
   m_Name: WasdPlayer
   m_TagString: Player
   m_Icon: {fileID: 0}
